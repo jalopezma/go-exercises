@@ -3,6 +3,7 @@ package sudoku
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -13,10 +14,34 @@ type Sudoku struct {
 	cells [max][max]int
 }
 
-// Init - Initializes the sudoku
-func (s *Sudoku) Init() {
+// Create - Creates a finished sudoku and remove some cells to create the puzzle
+func (s *Sudoku) Create() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	s.Solve()
+	fmt.Println("\nSudoku created\n", s)
+	s.removeCells()
+	fmt.Println("\nPuzzle created\n", s)
+}
+
+func (s *Sudoku) removeCells() {
+	removed := 0
+	i := 0
+	for {
+		for j := 0; j < max; j++ {
+			if rand.Intn(2) == 1 && s.cells[i][j] != 0 {
+				removed++
+				s.cells[i][j] = 0
+				//fmt.Printf("Remove [%v, %v] removed %v\n", i, j, removed)
+			}
+			if removed >= 64 { //64
+				break
+			}
+		}
+		i = (i + 1) % max
+		if removed >= 64 { //64
+			break
+		}
+	}
 }
 
 func (s *Sudoku) getEmptyCell() (x, y int) {
@@ -185,7 +210,11 @@ func (s *Sudoku) String() string {
 			if j%3 == 0 {
 				str = fmt.Sprintf("%v|", str)
 			}
-			str = fmt.Sprintf("%s %v ", str, col)
+			value := strconv.Itoa(col)
+			if value == "0" {
+				value = " "
+			}
+			str = fmt.Sprintf("%s %v ", str, value)
 		}
 		str = fmt.Sprintf("%s|\n", str)
 	}

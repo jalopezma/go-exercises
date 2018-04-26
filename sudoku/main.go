@@ -8,6 +8,7 @@ import (
 
 func main() {
 	sudoku := sudoku.Sudoku{}
-	sudoku.Init()
-	fmt.Println(sudoku.String())
+	sudoku.Create()
+	sudoku.Solve()
+	fmt.Println("\nSolution\n", sudoku.String())
 }
