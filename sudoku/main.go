@@ -22,7 +22,7 @@ func main() {
 	var content string
 	if file != "" {
 		content = readFile(file)
-		if sudoku.ReadFromString(content) {
+		if sudoku.InitFromString(content) {
 			sudoku.Solve()
 			fmt.Printf("\nSolution\n%v", sudoku.String())
 		}

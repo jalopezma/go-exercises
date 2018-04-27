@@ -82,48 +82,12 @@ func (s *Sudoku) Solve() (solved bool) {
 	return solved
 }
 
+// isSafe - Checks if a number can be placed in a cell without breaking the 3x3, row and col
 func (s *Sudoku) isSafe(x, y, n int) bool {
-	return s.isSafeCol(y, n) && s.isSafeRow(x, n) && s.isSafeCube(x, y, n)
+	return s.isSafeCol(y, n) && s.isSafeRow(x, n) && s.isSafeSquare(x, y, n)
 }
 
-/*
-		rand.Shuffle(len(numbers), func(i, j int) {
-			numbers[i], numbers[j] = numbers[j], numbers[i]
-		})
-		numberIndex := 0
-		j := 0
-		tries := 0
-		for {
-			n := numbers[numberIndex]
-			fmt.Printf("Shiffle: %v selected %v\n", numbers, n)
-			fmt.Printf("i %v j %v n %v nI %v\n", i, j, n, numberIndex)
-			safe := s.isSafeCol(j, n) && s.isSafeRow(i, n) && s.isSafeCube(i, j, n)
-			if safe {
-				s.cells[i][j] = n
-				numbers = append(numbers[:numberIndex], numbers[numberIndex+1:]...)
-				if len(numbers) > 0 {
-					numberIndex = numberIndex % len(numbers)
-				}
-				j++
-			} else {
-				fmt.Println(s.String())
-			}
-			if !safe {
-				numberIndex = (numberIndex + 1) % len(numbers)
-				tries++
-			}
-			if tries > 40 {
-				fmt.Println("tries > 40")
-				break
-			}
-			if j == max {
-				break
-			}
-		}
-	}
-}
-*/
-
+// in - Checks if an int is included on an array
 func (s *Sudoku) in(n int, list []int) bool {
 	in := false
 	for _, number := range list {
@@ -135,21 +99,23 @@ func (s *Sudoku) in(n int, list []int) bool {
 	return in
 }
 
-func (s *Sudoku) isSafeCube(i, j, n int) bool {
-	xCube := i / 3
-	yCube := j / 3
-	numbers := s.getNumbersCube(xCube, yCube)
+// isSafeSquare - Checks if the square of 3/3 is valid
+func (s *Sudoku) isSafeSquare(i, j, n int) bool {
+	xSquare := i / 3
+	ySquare := j / 3
+	numbers := s.getNumbersSquare(xCube, yCube)
 	r := !s.in(n, numbers)
 	if !r {
-		//	fmt.Printf("\nisSafeCube [%v, %v] %v %v\n", i, j, n, numbers)
+		//	fmt.Printf("\nisSafeSquare [%v, %v] %v %v\n", i, j, n, numbers)
 	}
 	return r
 }
 
-func (s *Sudoku) getNumbersCube(xCube, yCube int) []int {
+// getNumbersSquare - Get the number of the square for the given point (for x1, y1 = square 0, 0)
+func (s *Sudoku) getNumbersSquare(xCube, yCube int) []int {
 	numbers := []int{}
-	for i := xCube * 3; i < (xCube+1)*3; i++ {
-		for j := yCube * 3; j < (yCube+1)*3; j++ {
+	for i := xSquare * 3; i < (xCube+1)*3; i++ {
+		for j := ySquare * 3; j < (yCube+1)*3; j++ {
 			n := s.cells[i][j]
 			if n != 0 {
 				numbers = append(numbers, s.cells[i][j])
@@ -159,6 +125,7 @@ func (s *Sudoku) getNumbersCube(xCube, yCube int) []int {
 	return numbers
 }
 
+// isSafeRow - Checks if the N number can be placed in the row
 func (s *Sudoku) isSafeRow(i, n int) bool {
 	numbers := s.getNumbersRow(i)
 	r := !s.in(n, numbers)
@@ -168,6 +135,7 @@ func (s *Sudoku) isSafeRow(i, n int) bool {
 	return r
 }
 
+// getNumbersRow - Gets the numbers placed on the row given
 func (s *Sudoku) getNumbersRow(row int) []int {
 	numbers := []int{}
 	for j := 0; j < max; j++ {
@@ -179,6 +147,7 @@ func (s *Sudoku) getNumbersRow(row int) []int {
 	return numbers
 }
 
+// isSafeCol - Check if the N number can be placed in that col
 func (s *Sudoku) isSafeCol(j, n int) bool {
 	numbers := s.getNumbersCol(j)
 	r := !s.in(n, numbers)
@@ -188,6 +157,7 @@ func (s *Sudoku) isSafeCol(j, n int) bool {
 	return r
 }
 
+// getNumbersCol - Gets the numbers placed on the col given
 func (s *Sudoku) getNumbersCol(col int) []int {
 	numbers := []int{}
 	for i := 0; i < max; i++ {
@@ -225,8 +195,8 @@ func (s *Sudoku) String() string {
 	return str
 }
 
-// ReadFromArray -
-func (s *Sudoku) ReadFromArray(numbers []int) bool {
+// InitromArray - Inits the sudoku from an array
+func (s *Sudoku) InitFromArray(numbers []int) bool {
 	if len(numbers) < 81 {
 		return false
 	}
@@ -239,8 +209,8 @@ func (s *Sudoku) ReadFromArray(numbers []int) bool {
 	return true
 }
 
-// ReadFromString - Parses the string representation of the sudoku to a array of numbers
-func (s *Sudoku) ReadFromString(str string) bool {
+// InitromString - Inits the sudoku from the string representation
+func (s *Sudoku) InitromString(str string) bool {
 	numbers := []int{}
 	x := 0
 	y := 0
@@ -280,7 +250,7 @@ func (s *Sudoku) ReadFromString(str string) bool {
 
 	success := false
 	if len(numbers) == 81 {
-		success = s.ReadFromArray(numbers)
+		success = s.InitFromArray(numbers)
 	}
 	return success
 }
