@@ -18,9 +18,9 @@ type Sudoku struct {
 func (s *Sudoku) Create() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	s.Solve()
-	fmt.Println("\nSudoku created\n", s)
+	fmt.Printf("\nSudoku created\n%v\n", s)
 	s.removeCells()
-	fmt.Println("\nPuzzle created\n", s)
+	fmt.Printf("\nPuzzle created\n%v\n", s)
 }
 
 func (s *Sudoku) removeCells() {
@@ -204,20 +204,83 @@ func (s *Sudoku) String() string {
 	str := ""
 	for i, row := range s.cells {
 		if i%3 == 0 {
-			str = fmt.Sprintf("%v------------------------------\n", str)
+			str = fmt.Sprintf("%v -----------------------\n", str)
 		}
 		for j, col := range row {
 			if j%3 == 0 {
 				str = fmt.Sprintf("%v|", str)
+				if j != len(row) {
+					str = fmt.Sprintf("%v ", str)
+				}
 			}
 			value := strconv.Itoa(col)
 			if value == "0" {
 				value = " "
 			}
-			str = fmt.Sprintf("%s %v ", str, value)
+			str = fmt.Sprintf("%s%v ", str, value)
 		}
 		str = fmt.Sprintf("%s|\n", str)
 	}
-	str = fmt.Sprintf("%v------------------------------", str)
+	str = fmt.Sprintf("%v -----------------------", str)
 	return str
+}
+
+// ReadFromArray -
+func (s *Sudoku) ReadFromArray(numbers []int) bool {
+	if len(numbers) < 81 {
+		return false
+	}
+	for x := 0; x < len(s.cells); x++ {
+		for y := 0; y < len(s.cells[x]); y++ {
+			s.cells[x][y] = numbers[0]
+			numbers = numbers[1:]
+		}
+	}
+	return true
+}
+
+// ReadFromString - Parses the string representation of the sudoku to a array of numbers
+func (s *Sudoku) ReadFromString(str string) bool {
+	numbers := []int{}
+	x := 0
+	y := 0
+	for i := 0; i < len(str); i++ {
+		char := string(str[i])
+		// Number of lines the sudoku representation has
+		if y >= 13 {
+			break
+		}
+		if char == "-" {
+			continue
+		} else if char == "\n" {
+			y++
+			continue
+		} else if char == "|" {
+			x = 0
+			continue
+		} else if x%2 == 0 {
+			x++
+			continue
+		}
+
+		var n int
+		var err error
+		if char == " " {
+			n = 0
+		} else {
+			n, err = strconv.Atoi(char)
+			if err != nil {
+				n = 0
+			} else {
+			}
+		}
+		numbers = append(numbers, n)
+		x++
+	}
+
+	success := false
+	if len(numbers) == 81 {
+		success = s.ReadFromArray(numbers)
+	}
+	return success
 }
